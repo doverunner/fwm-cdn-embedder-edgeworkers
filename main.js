@@ -19,6 +19,14 @@ export async function onClientRequest(request) {
         let arrUri = request.path.split('/');
         const prefixFolder = arrUri[1];
 
+        // Check if filename starts with "b." and return 403
+        const filename = request.path.split('/').pop();
+        if (filename?.startsWith('b.')) {
+            console.log('Unsafe file path request detected.', request.url);
+            request.respondWith(400, {}, 'Unsafe file path request detected.');
+            return;
+        }
+
         if (prefixFolder.startsWith('wmt:')) {
             // Using akamaiWmt
             finalRequestPath = await akamaiWmt.getContentUrl(request.path, arrUri, config);
